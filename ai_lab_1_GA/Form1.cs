@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using btl.generic;
 using alg_greedy;
+using System.Collections;
 
 namespace ai_lab_1_GA
 {
@@ -19,9 +20,11 @@ namespace ai_lab_1_GA
 
         static List<int> tasks = new List<int>();
         static List<int> pool = new List<int>();
+        static List<List<int>> skills = new List<List<int>>();
 
         static int resourcesN = 0;
         static int taskN = 0;
+        static int skillsN = 0;
 
         public Form1()
         {
@@ -91,7 +94,7 @@ namespace ai_lab_1_GA
                 }
                 textBox1.AppendText("======" + Environment.NewLine);
                 textBox1.AppendText("BEST: " + (tasks.Sum() - pool[best]) + Environment.NewLine);
-                textBox1.AppendText("AVERAGE: " + (tasks.Sum() - pool[average]) +  Environment.NewLine);
+                textBox1.AppendText("AVERAGE: " + (tasks.Sum() - pool[average]) + Environment.NewLine);
                 textBox1.AppendText("WORST: " + (tasks.Sum() - pool[worst]) + Environment.NewLine);
                 textBox1.AppendText("======" + Environment.NewLine);
             }
@@ -159,13 +162,19 @@ namespace ai_lab_1_GA
 
         private void button2_Click(object sender, EventArgs e)
         {
+
+
+
             string path = "";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
                 path = openFileDialog1.FileName;
                 string[] lines = System.IO.File.ReadAllLines(path);
 
-                int startIdx = 0;
+                int resStartIdx = 0;
+                int taskStartIdx = 0;
+
+
                 for (int i = 0; i < lines.Length; i++)
                 {
                     string line = lines[i];
@@ -179,16 +188,38 @@ namespace ai_lab_1_GA
                         resourcesN = int.Parse(line.Split("".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]);
                         continue;
                     }
+                    if (line.Contains("Number of skill types:"))
+                    {
+                        skillsN = int.Parse(line.Split("".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[4]);
+                        continue;
+                    }
+                    if (line.Contains("ResourceID"))
+                    {
+                        resStartIdx = i + 1;
+                    }
                     if (line.Contains("TaskID"))
                     {
-                        startIdx = i + 1;
+                        taskStartIdx = i + 1;
                         break;
                     }
                 }
 
+                for (int i = 0; i < resourcesN; i++)
+                {
+                    skills.Add(new List<int>());
+                    for (int j = 0; j < skillsN; j++)
+                    {
+                        skills[i].Add(0);
+                    }
+                }
+
+
+
+                assignSkills(lines, taskStartIdx, resStartIdx);
+
                 for (int i = 0; i < taskN; i++)
                 {
-                    string line = lines[startIdx + i];
+                    string line = lines[taskStartIdx + i];
                     tasks.Add(int.Parse(line.Split("".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)[1]));
                 }
 
@@ -198,6 +229,52 @@ namespace ai_lab_1_GA
             }
 
         }
+
+        private void assignSkills(string[] lines, int taskStartIdx, int resStartIdx)
+        {
+            int nowRes = 0;
+
+            for (int i = resStartIdx; i < taskStartIdx - 2; i++)
+            {
+                string line = lines[i];
+                string[] split = line.Split("".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                int splitIdx = 0;
+                if (line[0] == 'Q')
+                {
+                    splitIdx = 0;
+                    while (true)
+                    {
+                        try
+                        {
+                            skills[nowRes][(int)Char.GetNumericValue(split[splitIdx][1])] = (int)Char.GetNumericValue(split[splitIdx + 1][0]) + 1;
+                            splitIdx += 2;
+                        }
+                        catch
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    nowRes = int.Parse(split[0]) - 1;
+                    splitIdx = 2;
+                    while (true)
+                    {
+                        try
+                        {
+                            skills[nowRes][(int)Char.GetNumericValue(split[splitIdx][1])] = (int)Char.GetNumericValue(split[splitIdx + 1][0]) + 1;
+                            splitIdx += 2;
+                        }
+                        catch
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
 
         private void button3_Click(object sender, EventArgs e)
         {

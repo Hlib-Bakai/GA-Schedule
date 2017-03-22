@@ -52,7 +52,6 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="GA.cs" />
-    <Compile Include="GA_SKILLS.cs" />
     <Compile Include="Genome.cs" />
     <Compile Include="GenomeComparer.cs" />
     <Compile Include="Greedy.cs" />
