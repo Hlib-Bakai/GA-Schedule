@@ -20,7 +20,8 @@ namespace ai_lab_1_GA
 
         static List<int> tasks = new List<int>();
         static List<int> pool = new List<int>();
-        static List<List<int>> skills = new List<List<int>>();
+        static List<List<int>> skillsRes = new List<List<int>>();
+        static List<List<int>> skillsTasks = new List<List<int>>();
 
         static int resourcesN = 0;
         static int taskN = 0;
@@ -51,6 +52,14 @@ namespace ai_lab_1_GA
             res = resources.Max();
 
             return sum - res;
+        }
+
+        public static bool hasSkill(int res, int task)
+        {
+            int requiredSkill = skillsTasks[task].IndexOf(skillsTasks[task].Max());
+            int requiredLevel = skillsTasks[task].Max();
+            int hasLevel = skillsRes[res][requiredSkill];
+            return (hasLevel >= requiredLevel);
         }
 
 
@@ -162,9 +171,6 @@ namespace ai_lab_1_GA
 
         private void button2_Click(object sender, EventArgs e)
         {
-
-
-
             string path = "";
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
@@ -206,16 +212,23 @@ namespace ai_lab_1_GA
 
                 for (int i = 0; i < resourcesN; i++)
                 {
-                    skills.Add(new List<int>());
+                    skillsRes.Add(new List<int>());
                     for (int j = 0; j < skillsN; j++)
                     {
-                        skills[i].Add(0);
+                        skillsRes[i].Add(0);
                     }
                 }
 
-
-
-                assignSkills(lines, taskStartIdx, resStartIdx);
+                for (int i = 0; i < taskN; i++)
+                {
+                    skillsTasks.Add(new List<int>());
+                    for (int j = 0; j < skillsN; j++)
+                    {
+                        skillsTasks[i].Add(0);
+                    }
+                }              
+                assignSkillsTasks(lines, taskStartIdx);
+                assignSkillsRes(lines, taskStartIdx, resStartIdx);
 
                 for (int i = 0; i < taskN; i++)
                 {
@@ -230,7 +243,21 @@ namespace ai_lab_1_GA
 
         }
 
-        private void assignSkills(string[] lines, int taskStartIdx, int resStartIdx)
+        private void assignSkillsTasks(string[] lines, int taskStartIdx)
+        {
+            int nowRes = 0;
+
+            for (int i = taskStartIdx; i < taskStartIdx + taskN; i++)
+            {
+                string line = lines[i];
+                string[] split = line.Split("".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                nowRes = int.Parse(split[0]) - 1;
+                skillsTasks[nowRes][(int)Char.GetNumericValue(split[2][1])] = (int)Char.GetNumericValue(split[3][0]) + 1;
+            }
+        }
+
+
+        private void assignSkillsRes(string[] lines, int taskStartIdx, int resStartIdx)
         {
             int nowRes = 0;
 
@@ -246,7 +273,7 @@ namespace ai_lab_1_GA
                     {
                         try
                         {
-                            skills[nowRes][(int)Char.GetNumericValue(split[splitIdx][1])] = (int)Char.GetNumericValue(split[splitIdx + 1][0]) + 1;
+                            skillsRes[nowRes][(int)Char.GetNumericValue(split[splitIdx][1])] = (int)Char.GetNumericValue(split[splitIdx + 1][0]) + 1;
                             splitIdx += 2;
                         }
                         catch
@@ -263,7 +290,7 @@ namespace ai_lab_1_GA
                     {
                         try
                         {
-                            skills[nowRes][(int)Char.GetNumericValue(split[splitIdx][1])] = (int)Char.GetNumericValue(split[splitIdx + 1][0]) + 1;
+                            skillsRes[nowRes][(int)Char.GetNumericValue(split[splitIdx][1])] = (int)Char.GetNumericValue(split[splitIdx + 1][0]) + 1;
                             splitIdx += 2;
                         }
                         catch
@@ -274,7 +301,6 @@ namespace ai_lab_1_GA
                 }
             }
         }
-
 
         private void button3_Click(object sender, EventArgs e)
         {
