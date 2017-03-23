@@ -19,13 +19,14 @@ namespace ai_lab_1_GA
 
 
         static List<int> tasks = new List<int>();
-        static List<int> pool = new List<int>();
+        static List<double> pool = new List<double>();
         static List<List<int>> skillsRes = new List<List<int>>();
         static List<List<int>> skillsTasks = new List<List<int>>();
 
         static int resourcesN = 0;
         static int taskN = 0;
         static int skillsN = 0;
+        static int times = 0;
 
         public Form1()
         {
@@ -68,7 +69,7 @@ namespace ai_lab_1_GA
             i = 1;
             chart1.Series.Clear();
             pool.Clear();
-            int times = int.Parse(textBox6.Text);
+            times = int.Parse(textBox6.Text);
             for (int t = 0; t < times; t++)
             {
                 pool.Add(startGA());
@@ -78,7 +79,7 @@ namespace ai_lab_1_GA
 
             if (times > 2)
             {
-                List<int> copy = new List<int>(pool);
+                List<double> copy = new List<double>(pool);
                 List<bool> flags = new List<bool>();
                 for (int i = 0; i < pool.Count; i++)
                 {
@@ -109,7 +110,7 @@ namespace ai_lab_1_GA
             }
         }
 
-        private int indexOfAlg(List<int> pool, int x, ref List<bool> flags)
+        private int indexOfAlg(List<double> pool, double x, ref List<bool> flags)
         {
             int result = -1;
             for (int i = 0; i < pool.Count; i++)
@@ -124,7 +125,7 @@ namespace ai_lab_1_GA
             return result;
         }
 
-        private int startGA()
+        private double startGA()
         {
             chart1.Series.Add("GA" + i);
             chart1.Series["GA" + i].ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
@@ -140,19 +141,24 @@ namespace ai_lab_1_GA
             ga.FitnessFunction = new GAFunction(theFitnessFunction);
 
             ga.Elitism = true;
-            ga.Go(ref chart1, i, ref textBox1);
+
+            bool onlyOneGA = (times == 1);
+
+            ga.Go(ref chart1, i, ref textBox1, onlyOneGA);
 
             int[] values;
-            int fitness;
+            int fitness;      
             ga.GetBest(out values, out fitness);
             textBox1.AppendText("GA" + i + Environment.NewLine);
             textBox1.AppendText("Best time: " + (tasks.Sum() - fitness) + Environment.NewLine);
             textBox1.AppendText("Population: " + populationSize + Environment.NewLine);
             textBox1.AppendText("Generations: " + generations + Environment.NewLine);
 
+            double average = ga.totalAverageFitness();
+
             i++;
 
-            return fitness;
+            return average;
         }
 
         private void startGreedy()
@@ -227,8 +233,8 @@ namespace ai_lab_1_GA
                         skillsTasks[i].Add(0);
                     }
                 }              
-                assignSkillsTasks(lines, taskStartIdx);
-                assignSkillsRes(lines, taskStartIdx, resStartIdx);
+                //assignSkillsTasks(lines, taskStartIdx);
+                //assignSkillsRes(lines, taskStartIdx, resStartIdx);
 
                 for (int i = 0; i < taskN; i++)
                 {
