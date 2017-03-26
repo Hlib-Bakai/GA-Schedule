@@ -86,12 +86,10 @@ namespace ai_lab_1_GA
                     flags.Add(false);
                 }
                 copy.Sort();
-
-                int best = indexOfAlg(pool, pool.Max(), ref flags);
+                /*
                 chart1.Series["GA" + (1 + best)].Name = "Best";
 
 
-                int worst = indexOfAlg(pool, pool.Min(), ref flags);
                 chart1.Series["GA" + (1 + worst)].Name = "Worst";
 
                 int average = indexOfAlg(pool, copy[copy.Count / 2], ref flags);
@@ -102,6 +100,32 @@ namespace ai_lab_1_GA
                     if (a != best && a != worst && a != average)
                         chart1.Series.Remove(chart1.Series["GA" + (a + 1)]);
                 }
+                */
+
+
+                int average = indexOfAlg(pool, copy[copy.Count / 2], ref flags);
+                int kol = chart1.Series.Count;
+                List<string> delete = new List<string>();
+                for (int a = 0; a < kol; a++)
+                {
+                    if (chart1.Series[a].Name != "GA" + (average + 1) + " Best" &&
+                        chart1.Series[a].Name != "GA" + (average + 1) + " Worst" &&
+                        chart1.Series[a].Name != "GA" + (average + 1))
+                    {
+                        delete.Add(chart1.Series[a].Name);
+                    }
+                }
+
+                foreach (string name in delete)
+                {
+                    chart1.Series.Remove(chart1.Series[name]);
+                }
+
+                int best = indexOfAlg(pool, pool.Max(), ref flags);
+                int worst = indexOfAlg(pool, pool.Min(), ref flags);
+
+
+
                 textBox1.AppendText("======" + Environment.NewLine);
                 textBox1.AppendText("BEST: " + (tasks.Sum() - pool[best]) + Environment.NewLine);
                 textBox1.AppendText("AVERAGE: " + (tasks.Sum() - pool[average]) + Environment.NewLine);
@@ -142,7 +166,8 @@ namespace ai_lab_1_GA
 
             ga.Elitism = true;
 
-            bool onlyOneGA = (times == 1);
+            //bool onlyOneGA = (times == 1);
+            bool onlyOneGA = true;
 
             ga.Go(ref chart1, i, ref textBox1, onlyOneGA);
 
