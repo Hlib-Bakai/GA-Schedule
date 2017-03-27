@@ -125,12 +125,19 @@ namespace ai_lab_1_GA
                 int worst = indexOfAlg(pool, pool.Min(), ref flags);
 
 
-
+                /*
                 textBox1.AppendText("======" + Environment.NewLine);
                 textBox1.AppendText("BEST: " + (tasks.Sum() - pool[best]) + Environment.NewLine);
                 textBox1.AppendText("AVERAGE: " + (tasks.Sum() - pool[average]) + Environment.NewLine);
                 textBox1.AppendText("WORST: " + (tasks.Sum() - pool[worst]) + Environment.NewLine);
                 textBox1.AppendText("======" + Environment.NewLine);
+                */
+                textBox1.AppendText("======" + Environment.NewLine);
+                textBox1.AppendText("BEST: " + (chart1.Series["GA" + (average + 1) + " Best"].Points.Last().YValues[0]) + Environment.NewLine);
+                textBox1.AppendText("AVERAGE: " + (chart1.Series["GA" + (average + 1)].Points.Last().YValues[0]) + Environment.NewLine);
+                textBox1.AppendText("WORST: " + (chart1.Series["GA" + (average + 1) + " Worst"].Points.Last().YValues[0]) + Environment.NewLine);
+                textBox1.AppendText("======" + Environment.NewLine);
+
             }
         }
 
